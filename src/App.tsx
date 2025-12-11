@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
 import './App.css';
 import { getNumbers } from './utils';
 import { Pagination } from './components/Pagination';
+import { useSearchParams } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const items = getNumbers(1, 42).map(n => `Item ${n}`);
 
 export const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(5);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageFromUrl = searchParams.get('page');
+  const currentPage = pageFromUrl ? Number(pageFromUrl) : 1;
+  const perPageFromUrl = searchParams.get('perPage');
+  const perPage = perPageFromUrl ? Number(perPageFromUrl) : 5;
   const totalPages = Math.ceil(items.length / perPage);
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = startIndex + perPage;
@@ -16,15 +19,21 @@ export const App: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+      const newParams = Object.fromEntries(searchParams.entries());
+
+      newParams.page = String(page);
+      setSearchParams(newParams);
     }
   };
 
   const handlePerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newPerPage = +event.target.value;
+    const newParams = Object.fromEntries(searchParams.entries());
 
-    setPerPage(newPerPage);
-    setCurrentPage(1);
+    newParams.perPage = String(newPerPage);
+    newParams.page = '1';
+
+    setSearchParams(newParams);
   };
 
   return (

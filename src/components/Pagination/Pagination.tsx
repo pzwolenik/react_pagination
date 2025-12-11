@@ -1,14 +1,14 @@
 type Props = {
   total: number;
   perPage: number;
-  currentPage: number;
+  currentPage?: number;
   onPageChange: (page: number) => void;
 };
 
 export const Pagination = ({
   total,
   perPage,
-  currentPage,
+  currentPage = 1,
   onPageChange,
 }: Props) => {
   const totalPages = Math.ceil(total / perPage);
@@ -21,21 +21,30 @@ export const Pagination = ({
   const createPageChangeHandler =
     (page: number) => (event: React.MouseEvent) => {
       event.preventDefault();
-      onPageChange(page);
+
+      if (page !== currentPage) {
+        onPageChange(page);
+      }
     };
+
+  const isPrevDisabled = currentPage === 1;
+  const isNextDisabled = currentPage === totalPages;
 
   const handlePrevPage = (event: React.MouseEvent) => {
     event.preventDefault();
-    onPageChange(currentPage - 1);
+
+    if (!isPrevDisabled) {
+      onPageChange(currentPage - 1);
+    }
   };
 
   const handleNextPage = (event: React.MouseEvent) => {
     event.preventDefault();
-    onPageChange(currentPage + 1);
-  };
 
-  const isPrevDisabled = currentPage === 1;
-  const isNextDisabled = currentPage === totalPages;
+    if (!isNextDisabled) {
+      onPageChange(currentPage + 1);
+    }
+  };
 
   return (
     <ul className="pagination">
